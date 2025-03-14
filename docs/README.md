@@ -4,7 +4,7 @@
 
 2. **[FFLIB Implementation Guide & Best Practices](02-FFLIB-Implementation-Guide.md)** - A practical guide for implementing FFLIB in your Salesforce projects, with step-by-step instructions and best practices.
 
-3. **[FFLIB Class Diagram](03-FFLIB-Common-Class-Diagram.svg)** - A visual representation of the class structure and relationships in the FFLIB architecture.
+3. **[FFLIB Class Diagram](https://raw.githubusercontent.com/quanlin-guo/fflib-apex-common-samplecode/140add63a1e61ac2b421d4ad82a22ba8cafed541/docs/03-FFLIB-Common-Class-Diagram.svg)** - A visual representation of the class structure and relationships in the FFLIB architecture.
 
 4. **[FFLIB Sequence Diagram](04-FFLIB-Common-Sequence-Diagram.plantuml)** - A sequence diagram showing the interaction flow between components during an opportunity discount operation.
 
