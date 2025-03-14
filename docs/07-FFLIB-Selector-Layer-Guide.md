@@ -714,4 +714,291 @@ for(Contact contact : [SELECT Id, AccountId FROM Contact WHERE AccountId IN :acc
 for(Account account : accounts) {
     List<Contact> contacts = contactsByAccountId.get(account.Id);
     if(contacts != null) {
-        //
+        // Process contacts for this account
+    }
+}
+```
+
+### 2. Query Filter Complexity
+
+**Problem**: Complex query filters can become difficult to maintain.
+
+**Solution**: Break down complex conditions into smaller, composable parts:
+
+```apex
+public List<Account> selectByFilterCriteria(AccountFilterCriteria criteria) {
+    fflib_QueryFactory queryFactory = newQueryFactory();
+    
+    // Start with base condition
+    String condition = '';
+    
+    // Add industry filter if specified
+    if(criteria.industry != null) {
+        condition = addCondition(condition, 'Industry = \'' + String.escapeSingleQuotes(criteria.industry) + '\'');
+    }
+    
+    // Add revenue filter if specified
+    if(criteria.minRevenue != null) {
+        condition = addCondition(condition, 'AnnualRevenue >= ' + criteria.minRevenue);
+    }
+    
+    // Add country filter if specified
+    if(criteria.countries != null && !criteria.countries.isEmpty()) {
+        String countriesString = '(\'' + String.join(criteria.countries, '\',\'') + '\')';
+        condition = addCondition(condition, 'BillingCountry IN ' + countriesString);
+    }
+    
+    // Add active status filter if specified
+    if(criteria.activeOnly) {
+        condition = addCondition(condition, 'IsActive__c = true');
+    }
+    
+    // Set the final condition
+    if(String.isNotBlank(condition)) {
+        queryFactory.setCondition(condition);
+    }
+    
+    return (List<Account>) Database.query(queryFactory.toSOQL());
+}
+
+private String addCondition(String existingCondition, String newCondition) {
+    return String.isBlank(existingCondition) ? 
+        newCondition : 
+        existingCondition + ' AND ' + newCondition;
+}
+
+// Filter criteria class
+public class AccountFilterCriteria {
+    public String industry { get; set; }
+    public Decimal minRevenue { get; set; }
+    public List<String> countries { get; set; }
+    public Boolean activeOnly { get; set; }
+}
+```
+
+### 3. Field Security and Performance
+
+**Problem**: Enforcing FLS can impact performance in high-volume scenarios.
+
+**Solution**: Selectively disable FLS enforcement for specific use cases:
+
+```apex
+public class AccountsSelector extends fflib_SObjectSelector implements IAccountsSelector {
+    public AccountsSelector() {
+        // Enable FLS by default
+        super(true);
+    }
+    
+    // High-performance query for batch processing
+    public Database.QueryLocator getQueryLocatorForBatch() {
+        // Disable FLS for batch operations where performance is critical
+        return Database.getQueryLocator(
+            newQueryFactory(false)  // false = don't enforce FLS
+                .selectField('Id')
+                .selectField('Name')
+                .selectField('LastModifiedDate')
+                .toSOQL()
+        );
+    }
+}
+```
+
+### 4. Query Factory Complexity
+
+**Problem**: Building complex queries with QueryFactory can be verbose and error-prone.
+
+**Solution**: Create helper methods for common query patterns:
+
+```apex
+// Helper method for adding standard filter conditions
+private fflib_QueryFactory addStandardFilters(
+    fflib_QueryFactory queryFactory, 
+    Date startDate, 
+    Date endDate, 
+    String searchText
+) {
+    if(startDate != null) {
+        queryFactory.setCondition('CreatedDate >= :startDate');
+    }
+    
+    if(endDate != null) {
+        String condition = queryFactory.getCondition();
+        queryFactory.setCondition(
+            String.isBlank(condition) ? 
+            'CreatedDate <= :endDate' : 
+            condition + ' AND CreatedDate <= :endDate'
+        );
+    }
+    
+    if(String.isNotBlank(searchText)) {
+        String likeValue = '%' + searchText + '%';
+        String condition = queryFactory.getCondition();
+        queryFactory.setCondition(
+            String.isBlank(condition) ? 
+            'Name LIKE :likeValue' : 
+            condition + ' AND Name LIKE :likeValue'
+        );
+    }
+    
+    return queryFactory;
+}
+
+// Using the helper
+public List<Account> selectWithFilters(Date startDate, Date endDate, String searchText) {
+    fflib_QueryFactory queryFactory = newQueryFactory();
+    
+    // Add standard filters
+    addStandardFilters(queryFactory, startDate, endDate, searchText);
+    
+    return (List<Account>) Database.query(queryFactory.toSOQL());
+}
+```
+
+## Performance Optimization Techniques
+
+### 1. SELECT Field Optimization
+
+Choose fields carefully to minimize data transfer:
+
+```apex
+// Instead of selecting all fields
+public List<Schema.SObjectField> getSObjectFieldList() {
+    return new List<Schema.SObjectField> {
+        Account.Id,
+        Account.Name,
+        Account.Type,
+        Account.Industry,
+        Account.AnnualRevenue,
+        Account.BillingStreet,
+        Account.BillingCity,
+        Account.BillingState,
+        Account.BillingPostalCode,
+        Account.BillingCountry,
+        Account.ShippingStreet,
+        Account.ShippingCity,
+        Account.ShippingState,
+        Account.ShippingPostalCode,
+        Account.ShippingCountry,
+        Account.Phone,
+        Account.Fax,
+        Account.Website,
+        Account.NumberOfEmployees,
+        Account.Ownership,
+        Account.TickerSymbol
+        // Many more fields...
+    };
+}
+
+// Be more selective for specific queries
+public List<Account> selectMinimalFields(Set<Id> accountIds) {
+    return (List<Account>) Database.query(
+        newQueryFactory(true) // Keep FLS enforcement
+            .selectField('Id')
+            .selectField('Name')
+            .selectField('Industry')
+            .setCondition('Id IN :accountIds')
+            .toSOQL()
+    );
+}
+```
+
+### 2. Indexed Field Usage
+
+Optimize queries to use indexed fields:
+
+```apex
+// Inefficient - not using indexed fields
+public List<Account> selectInefficient(String city) {
+    return Database.query(
+        newQueryFactory()
+            .setCondition('BillingCity = :city')
+            .toSOQL()
+    );
+}
+
+// Efficient - using indexed field (Id)
+public List<Account> selectEfficient(String city, Integer limit) {
+    return Database.query(
+        newQueryFactory()
+            .setCondition('BillingCity = :city AND Id != null')
+            .addOrdering('Id', fflib_QueryFactory.SortOrder.ASCENDING)
+            .setLimit(limit)
+            .toSOQL()
+    );
+}
+```
+
+### 3. Selective Query Filters
+
+Use selective query filters to improve performance:
+
+```apex
+// Less selective - could retrieve too many records
+public List<Account> selectNonSelective() {
+    return Database.query(
+        newQueryFactory()
+            .setCondition('Industry = \'Technology\'')
+            .toSOQL()
+    );
+}
+
+// More selective - limits the result set
+public List<Account> selectSelective() {
+    return Database.query(
+        newQueryFactory()
+            .setCondition('Industry = \'Technology\' AND AnnualRevenue > 1000000 AND CreatedDate = LAST_N_DAYS:30')
+            .toSOQL()
+    );
+}
+```
+
+### 4. Batch Processing
+
+For large data sets, use batch apex with query locators:
+
+```apex
+public Database.QueryLocator getQueryLocatorForLargeDataset(String industry) {
+    return Database.getQueryLocator(
+        newQueryFactory(false) // Disable FLS for performance
+            .selectField('Id')
+            .selectField('Name')
+            .setCondition('Industry = :industry')
+            .toSOQL()
+    );
+}
+
+// Example batch class using the query locator
+public class AccountBatchProcessor implements Database.Batchable<SObject> {
+    private String industry;
+    
+    public AccountBatchProcessor(String industry) {
+        this.industry = industry;
+    }
+    
+    public Database.QueryLocator start(Database.BatchableContext context) {
+        return AccountsSelector.newInstance().getQueryLocatorForLargeDataset(industry);
+    }
+    
+    public void execute(Database.BatchableContext context, List<Account> scope) {
+        // Process accounts
+    }
+    
+    public void finish(Database.BatchableContext context) {
+        // Finish processing
+    }
+}
+```
+
+## Conclusion
+
+The Selector Layer is a foundational component of the FFLIB Apex Common architecture that provides a structured approach to data retrieval. By implementing this pattern effectively, you can create more maintainable, performant, and secure applications.
+
+Key takeaways:
+
+1. **Centralized Queries**: Keep all SOQL queries in selector classes
+2. **Security**: Consistently enforce FLS when appropriate
+3. **Query Factory**: Leverage the QueryFactory for complex queries and relationships
+4. **Performance**: Optimize your queries for better performance
+5. **Testing**: Write comprehensive tests for your selector classes
+
+By following these guidelines and best practices, you'll leverage the full power of the FFLIB Selector Layer pattern in your Salesforce applications.
