@@ -1,3 +1,4 @@
+```platuml
 sequenceDiagram
     participant Controller as OpportunityController
     participant App as Application
@@ -48,3 +49,4 @@ sequenceDiagram
     Service-->>Controller: Success
     
     Note over Controller,DB: End of Apply Discount Flow
+```
