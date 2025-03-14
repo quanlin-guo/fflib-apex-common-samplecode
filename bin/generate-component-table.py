@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 This script recursively scans a Salesforce source directory and compiles a Markdown table.
 It includes all files found—even if they don't match any known Salesforce metadata type—by leaving the type field empty.
@@ -170,7 +169,7 @@ def print_usage():
     How it works:
     - Informs the user how to run the script with the required directory argument.
     """
-    print("Usage: python scan_sf_directory.py <directory>")
+    print("Usage: python generate-component-table.py <directory>")
     print("Scans a Salesforce source directory and generates a Markdown table.")
 
 def main():
