@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
     subgraph "Client Layer"
         VF[Visualforce Pages]
@@ -84,3 +85,4 @@ flowchart TD
     class SelectorInt,SelectorImpl,QueryFac selectorLayer
     class UOW unitOfWork
     class DB database
+```
