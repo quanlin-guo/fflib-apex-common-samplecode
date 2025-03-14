@@ -21,7 +21,13 @@ FFLIB is built on several key design patterns:
 
 The library implements a layered architecture with the following main components:
 
-![FFLIB Architecture Layers](https://raw.githubusercontent.com/apex-enterprise-patterns/fflib-apex-common-samplecode/master/images/sampleappoverview.png)
+| Platform Feature       | Patterns Used                                                                                   |
+|------------------------|-------------------------------------------------------------------------------------------------|
+| **Custom Buttons**     | Building UI logic and calling **Service Layer** code from Controllers                           |
+| **Batch Apex**         | Reusing **Service** and **Selector Layer** code from within a Batch context                     |
+| **Integration API**    | Exposing an Integration API via **Service Layer** using Apex and REST                           |
+| **Apex Triggers**      | Factoring your Apex Trigger logic via the **Domain Layer** (wrappers)                           |
+| **VisualForce Remoting** | Exposing **Service Layer** code to HTML5 / JavaScript libraries such as jQuery               |
 
 ### 1. Service Layer
 
