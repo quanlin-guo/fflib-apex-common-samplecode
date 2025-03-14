@@ -178,18 +178,4 @@
   
   <rect x="800" y="705" width="20" height="20" fill="#f8cecc" stroke="#b85450" stroke-width="1" />
   <text x="830" y="720" font-family="Arial" font-size="12" text-anchor="start" fill="#333">Client Layer</text>
-  
-  <!-- Line types -->
-  <line x1="80" y1="740" x2="120" y2="740" stroke="#333" stroke-width="1.5" />
-  <text x="130" y="745" font-family="Arial" font-size="12" text-anchor="start" fill="#333">Implementation</text>
-  
-  <line x1="280" y1="740" x2="320" y2="740" stroke="#333" stroke-width="1.5" stroke-dasharray="5,3" />
-  <text x="330" y="745" font-family="Arial" font-size="12" text-anchor="start" fill="#333">Dependency</text>
-  
-  <line x1="480" y1="740" x2="520" y2="740" stroke="#333" stroke-width="1.5" />
-  <polygon points="515,740 520,737 520,743" fill="#333" />
-  <text x="530" y="745" font-family="Arial" font-size="12" text-anchor="start" fill="#333">Association</text>
-  
-  <line x1="680" y1="740" x2="720" y2="740" stroke="#333" stroke-width="1.5" stroke-dasharray="5,3" />
-  <polygon points="715,740 720,737 720,743" fill="#333" />
-  <text x="730" y="745" font-family="Arial" font-size="12" text-anchor="start" fill="#333">Dependency with Direction</text>
+</svg>
