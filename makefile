@@ -18,3 +18,6 @@ set-target-org:
 
 deploy:
 	sf project deploy start --target-org fflib-apex-mocks
+
+generate-component-table:
+	./bin/generate-component-table.py sfdx-source > docs/08-component-table.md
