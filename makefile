@@ -8,3 +8,13 @@ open-in-github:
 
 open-upstream-in-github:
 	open $(REPO_UPSTREAM)/tree/$(BRANCH)/$(SUBDIR)
+
+TARGET_ORG=:fflib-apex-mocks
+
+set-target-org:
+	sf config get target-org
+	sf config set target-org=$(TARGET_ORG)
+	sf config get target-org
+
+deploy:
+	sf project deploy start --target-org fflib-apex-mocks
