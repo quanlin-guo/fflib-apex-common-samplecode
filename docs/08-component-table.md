@@ -1,4 +1,3 @@
-┌─────────┬─────────────────────────────────────────────────┬───────────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ State   │ Name                                            │ Type              │ Path                                                                                                                 │
 ├─────────┼─────────────────────────────────────────────────┼───────────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
 │ Changed │ Application                                     │ ApexClass         │ sfdx-source/apex-common-samplecode/main/classes/Application.cls                                                      │
@@ -182,4 +181,3 @@
 │ Created │ Opportunity.BatchInvoicing                      │ WebLink           │ sfdx-source/apex-common-samplecode/main/objects/Opportunity/webLinks/BatchInvoicing.webLink-meta.xml                 │
 │ Created │ Opportunity.CreateInvoice                       │ WebLink           │ sfdx-source/apex-common-samplecode/main/objects/Opportunity/webLinks/CreateInvoice.webLink-meta.xml                  │
 │ Created │ Opportunity.CreateInvoices                      │ WebLink           │ sfdx-source/apex-common-samplecode/main/objects/Opportunity/webLinks/CreateInvoices.webLink-meta.xml                 │
-└─────────┴─────────────────────────────────────────────────┴───────────────────┴──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
