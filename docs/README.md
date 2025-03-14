@@ -10,7 +10,7 @@
 
 5. **[FFLIB Component Diagram](05-FFLIB-Component-Diagram.plantuml)** - A component diagram showing the high-level architecture and interactions between different layers.
 
-6. **[FFLIB Domain Layer Pattern Guide](06-FFLIB-Domain-Layer-Guide.md()** - An in-depth guide to implementing the Domain Layer, which encapsulates business logic.
+6. **[FFLIB Domain Layer Pattern Guide](06-FFLIB-Domain-Layer-Guide.md)** - An in-depth guide to implementing the Domain Layer, which encapsulates business logic.
 
 7. **[FFLIB Selector Layer Pattern Guide](07-FFLIB-Selector-Layer-Guide.md)** - A detailed guide to implementing the Selector Layer, which handles all data retrieval.
 
